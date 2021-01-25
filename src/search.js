@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
-import './search.css'
 import SearchIcon from '@material-ui/icons/Search';
-import Footer from './footer';
-import SearchResultList from './searchresultlist';
+import Footer from './Footer';
+import SearchResultList from './Searchresultlist';
 
 class Search extends Component {
     slicedButtons = [];
@@ -24,48 +23,46 @@ class Search extends Component {
         this.searchShow(this.state.query, this.state.page);
     }
 
-    setPage(val){
-        console.log("val is setPage", val);
+    setPage(page){
+        // console.log("page in setPage", page);
         const {query, buttons} = this.state;
-        this.slicedButtons = buttons?.slice(val-1,val+4);
-        this.searchShow(query, val);
+        this.slicedButtons = buttons?.slice(page-1,page+4);
+        this.searchShow(query, page);
     }
     
-    
-    pageButtons(val) {
-        console.log("val in pageButtons", val);
+    generatePageButtons(page) {
+        // console.log("page in search pageButtons", page);
         const buttons = []; 
-        if (!val) {return };
-        for(let i = 1; i < val+1; i +=1 ) 
+        if (!page) {return };
+        for(let i = 1; i < page+1; i +=1 ) 
         {
             buttons.push( 
-                <Button id="pageBtns"type="button" onClick={() => this.setPage(i)} key={i} className={`button-${i}`}>
+                <Button id="pageBtns" type="button" onClick={() => this.setPage(i)} key={i} className={`button-${i}`}>
                    {i}
                 </Button> )
         }
-        console.log("pagebuttons",buttons);
+        // console.log("pagebuttons",buttons);
         this.setState({buttons});
     }
 
     onChange(e) {
-        console.log("event", e);
+        // console.log("event", e);
         this.setState({ query: e.target.value});
     }
 
     onSubmit(e) {
         e.preventDefault();
         const {query,page} = this.state;
-        console.log("event", e);
+        // console.log("event", e);
         if (this.state.query && this.state.query.length > 1) {
             this.searchShow(query, page);
-        }   
+        }
+        document.getElementById("input").value = "";   
     }
 
     searchShow(query, page) {
-  
-        console.log("query",this.state.query);
-        console.log("page",this.state.page);
-        
+        // console.log("query",this.state.query);
+        // console.log("page",this.state.page);
         const url = `https://www.episodate.com/api/search?q=${query}&page=${page}`;
         if (query) {          
             fetch(url, {
@@ -81,50 +78,54 @@ class Search extends Component {
                     const details = response && await response.json();
                     tv_show.description = details && details.tvShow.description.slice(0, 100) + '...';
                 }
-                this.pageButtons(data.pages);  
+                this.generatePageButtons(data.pages);  
                 this.setState({ pageButtons: data.pages, total: data.total, pages: data.pages, tv_shows: data.tv_shows });
-                console.log("TTTThe state", this.state);           
+                // console.log("TTTThe state", this.state);           
             })
             .catch(e => console.log( "Error:",e ));       
-        }
-
+        }    
     }
 
     render() {
-          const { tv_shows, total } = this.state;  
-          console.log(this.state.pageButtons);
-          console.log("state buttons ", this.state.buttons);
-          const endPage = this.state.pageButtons; 
-          console.log("endPage ", endPage);
-          console.log("this.state.data.tv_shows ", this.state.data.tv_shows);
-          console.log("tv_shows ", tv_shows);
+        const { tv_shows, total, buttons } = this.state;  
+        // console.log(this.state.pageButtons);
+        // console.log("state buttons ", this.state.buttons);
+        const endPage = this.state.pageButtons; 
+        // console.log("endPage ", endPage);
+        // console.log("this.state.data.tv_shows ", this.state.data.tv_shows);
+        // console.log("tv_shows ", tv_shows);
 
         return (                      
-            <div>             
-                <form className="container text-center" onSubmit={this.onSubmit.bind(this)}>
-                    <input
-                    id="input"
-                    type="text"
-                    className="search-box"
-                    placeholder="Search for the show"  
-                    onChange={this.onChange.bind(this)}
-                />
-                <Button type="submit">
-                   <SearchIcon/>
-                </Button> 
+            <div> 
+                <form onSubmit={this.onSubmit.bind(this)}>
+                    <div className="form-group text-right">
+                        <Button className="text-left" onClick={this.props.onShowFirstPage}>Home</Button>
+                        <input
+                        id="input"
+                        type="text"
+                        className="col-4"
+                        placeholder="Search for the show"  
+                        onChange={this.onChange.bind(this)}
+                        />
+                        <Button type="submit" onClick = {this.props.onHideFirstPage}>
+                            <SearchIcon/>
+                        </Button> 
+                    </div>
                 </form>                             
-                <div className="container text-center">
-                    {this.state.buttons && this.state.buttons.slice(0,endPage) }    
-                </div>                           
                 {tv_shows && 
-                    <SearchResultList tv_shows={tv_shows} />
-                }              
-                {tv_shows && total &&
+                    <SearchResultList 
+                        tv_shows = {tv_shows} 
+                        endPage = {endPage} 
+                        buttons = {buttons}
+                    />
+                }  
+                {tv_shows && total && 
                     <Footer 
-                        total={this.state.total}
-                        pages={this.state.pageButtons}
-                />  }              
-                 
+                        total = {this.state.total}
+                        pages = {this.state.pageButtons}
+                        query = {this.state.query}
+                    />  
+                }
             </div>
         );
     }

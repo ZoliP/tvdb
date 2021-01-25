@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 class Header extends Component {
-    state = {  }
+
     render() { 
         return (
             <div className="jumbotron jumbotron-fluid bg-dark">
@@ -9,7 +9,7 @@ class Header extends Component {
                     <p className="lead text-white">Find informations about your favorit shows...</p>            
                 </div>
             </div>
-          );
+        );
     }
 }
  

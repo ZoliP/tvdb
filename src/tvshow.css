@@ -1,5 +1,5 @@
 #card {
-  width: 20rem;
+  width: 19rem;
   height: 40rem;
   display: inline-flex;
   box-shadow: 10px 10px 18px #333333;
@@ -7,7 +7,7 @@
 }
 
 img {
-  width: 19rem;
+  width: 18rem;
   height: 17rem;
   margin: 0 auto;
   object-fit: cover;
